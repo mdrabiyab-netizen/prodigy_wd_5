@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang=3D"en">
+
+<head>
+    <meta charset=3D"UTF-8">
+    <meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale=
+=3D1.0">
+    <title>Weather App</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, blue, skyblue);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 85%;
+            padding: 10px;
+            background: lightgreen;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #weatherInfo {
+            margin-top: 20px;
+        }
+
+        .small {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class=3D"container">
+        <h2>Weather App</h2>
+
+        <input type=3D"text" id=3D"cityInput" placeholder=3D"Enter city nam=
+e">
+        <button onclick=3D"getWeather()">Search Weather</button>
+        <button onclick=3D"getLocationWeather()">Use Current Location</butt=
+on>
+
+        <div id=3D"weatherInfo"></div>
+    </div>
+
+    <script>
+        const API_KEY =3D "YOUR_API_KEY_HERE"; // =E2=86=90 Replace with yo=
+ur
+OpenWeatherMap API Key
+
+        // Fetch weather by city
+        function getWeather() {
+            const city =3D document.getElementById("cityInput").value;
+
+            if (city =3D=3D=3D "") {
+                alert("Please enter a city name");
+                return;
+            }
+
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=3D${ci=
+ty}
+&appid=3D${API_KEY}&units=3Dmetric`)
+                .then(response =3D> response.json())
+                .then(data =3D> displayWeather(data))
+                .catch(() =3D> alert("City not found"));
+        }
+
+        // Fetch weather using user's location
+        function getLocationWeather() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position =3D> {
+                    let lat =3D position.coords.latitude;
+                    let lon =3D position.coords.longitude;
+
+                    fetch(`
+https://api.openweathermap.org/data/2.5/weather?lat=3D${lat}&lon=3D${lon}&a=
+ppid=3D
+${API_KEY}&units=3Dmetric`)
+                        .then(response =3D> response.json())
+                        .then(data =3D> displayWeather(data));
+                });
+            } else {
+                alert("Geolocation is not supported by your browser");
+            }
+        }
+
+        // Display weather data
+        function displayWeather(data) {
+            if (data.cod =3D=3D=3D "404") {
+                document.getElementById("weatherInfo").innerHTML =3D `<p>Ci=
+ty
+not found!</p>`;
+                return;
+            }
+
+            const weatherHTML =3D `
+            <h3>${data.name}, ${data.sys.country}</h3>
+            <h1>${Math.round(data.main.temp)}=C2=B0C</h1>
+            <p>${data.weather[0].main} - ${data.weather[0].description}</p>
+
+            <p class=3D"small">Humidity: ${data.main.humidity}%</p>
+            <p class=3D"small">Wind Speed: ${data.wind.speed} m/s</p>
+        `;
+
+            document.getElementById("weatherInfo").innerHTML =3D weatherHTM=
+L;
+        }
+    </script>
+
+</body>
+
+</html>
